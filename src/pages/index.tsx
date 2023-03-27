@@ -25,8 +25,13 @@ const CreatePostWizard = () => {
       setInput("");
       await ctx.posts.getAll.invalidate();
     },
-    onError: () => {
-      toast.error("Failed to post! Plese try again later.");
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post! Plese try again later.");
+      }
     },
   });
 
@@ -46,9 +51,16 @@ const CreatePostWizard = () => {
         className="p- grow bg-transparent"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            mutate({ content: input });
+          }
+        }}
         disabled={isPosting}
       />
-      <button onClick={() => mutate({ content: input })}>Post</button>
+      <button onClick={() => mutate({ content: input })} disabled={isPosting}>
+        {isPosting ? "Posting" : "Post"}
+      </button>
       {/* <SignOutButton /> */}
     </div>
   );
