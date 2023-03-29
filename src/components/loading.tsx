@@ -23,3 +23,11 @@ export const LoadingSpin = (props: { size?: number }) => {
     </div>
   );
 };
+
+export const LoadingPage = (props: { size?: number }) => {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <LoadingSpin size={props.size ?? 56} />
+    </div>
+  );
+};
