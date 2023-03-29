@@ -1,19 +1,12 @@
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
-import Head from "next/head";
-
-import { api, type RouterOutputs } from "~/utils/api";
-
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingSpin } from "~/components/loading";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import Link from "next/link";
 import { PageLayout } from "~/components/layout";
-
-dayjs.extend(relativeTime);
+import { LoadingPage } from "~/components/loading";
+import { PostView } from "~/components/postview";
+import { api } from "~/utils/api";
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -68,44 +61,10 @@ const CreatePostWizard = () => {
   );
 };
 
-type PostWithUser = RouterOutputs["posts"]["getAll"][number];
-
-const PostView = (props: PostWithUser) => {
-  const { post, author } = props;
-
-  return (
-    <div key={post.id} className="flex items-center gap-4 border-b p-8">
-      <Image
-        src={author.profileImageUrl}
-        width={56}
-        height={56}
-        alt={`@${author.username}'s profile picture`}
-        className=" rounded-full"
-      />
-      <div className="flex flex-col">
-        <div className="flex gap-1">
-          <Link href={`/@${author.username}`} className="font-bold">
-            {`@${author.username}`}
-          </Link>
-          <Link href={`/post/${post.id}`}>{` · ${dayjs(
-            post.createdAt
-          ).fromNow()}`}</Link>
-        </div>
-        <span>{post.content}</span>
-      </div>
-    </div>
-  );
-};
-
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  if (postsLoading)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingSpin size={56} />
-      </div>
-    );
+  if (postsLoading) return <LoadingPage />;
 
   if (!data) return <div>Something went wrong here</div>;
 
